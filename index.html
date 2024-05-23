@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isotopos Bogotá - Relación P/GW δ¹⁸O</title>
+    <!-- Plotly.js CDN -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- Bootstrap CSS CDN -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        #navbar {
+            background-color: #f8f9fa;
+            padding: 15px 0;
+        }
+        #plot-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 20px;
+        }
+        #sampling-points-map,
+        #isotopic-composition {
+            height: 90vh;
+            width: 49%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav id="navbar" class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <img src="assets/logos.png" height="100px" alt="">
+                Isotopos Bogotá - Relación P/GW δ¹⁸O
+            </a>
+            <div class="ml-auto">
+                <a href="https://github.com/hidabril/ISOTOPOS_BOGOTA" class="btn btn-primary" style="text-transform: none;">Ver código en Github</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Plot containers -->
+    <div id="plot-container">
+        <div id="sampling-points-map"></div>
+        <div id="isotopic-composition"></div>
+    </div>
+
+    <script>
+        // Load data from CSV
+        Plotly.d3.csv("https://raw.githubusercontent.com/hidabril/ISOTOPOS_BOGOTA/main/BASE_ISOTOPOS_SUBTERRANEA_COMPLETA.csv", function(data) {
+            // Process data
+            var site_lat = data.map(function(row) { return row.Lat; });
+            var site_lon = data.map(function(row) { return row.Lon; });
+            var site_PGW = data.map(function(row) { return row["P/GW"]; });
+
+            // Initialize map
+            var mapData = [{
+                type: 'scattermapbox',
+                lat: site_lat,
+                lon: site_lon,
+                mode: 'markers',
+                marker: {
+                    size: 8,
+                    symbol: 'circle',
+                    colorscale: 'Viridis',
+                    color: site_PGW,
+                    colorbar: {
+                        title: 'P/GW',
+                        orientation: 'h'
+                    }
+                }
+            }];
+
+            var mapLayout = {
+                autosize: true,
+                hovermode: 'closest',
+                title: 'Puntos de muestreos de agua subterránea',
+                mapbox: {
+                    style: 'outdoors-v12',
+                    center: {lat: 4.91, lon: -73.96},
+                    zoom: 8.5,
+                    accesstoken: 'YOUR_MAPBOX_ACCESS_TOKEN'
+                }
+            };
+
+            Plotly.newPlot('sampling-points-map', mapData, mapLayout);
+        });
+
+        // Isotopic composition scatter plot
+        var isotopicCompositionData = [{
+            // Data for isotopic composition scatter plot
+        }];
+
+        var isotopicCompositionLayout = {
+            title: 'Relación P/GW-δ18O precipitación y agua subterránea',
+            xaxis: {
+                title: 'δ¹⁸O',
+                range: [-7, -13]
+            },
+            yaxis: {
+                title: 'δ²H',
+                range: [-30, -90]
+            },
+            legend: {
+                x: 0,
+                y: 0.98,
+                orientation: 'h'
+            }
+        };
+
+        Plotly.newPlot('isotopic-composition', isotopicCompositionData, isotopicCompositionLayout);
+    </script>
+</body>
+</html>
